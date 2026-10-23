@@ -1,0 +1,7 @@
+# Never commit personal user desktop configurations, window snapshots, or logs
+desktop_config.json
+window_layout.json
+window_layout.prev.json
+desktop_guard.log
+desktop_guard_dashboard.html
+*.zip
