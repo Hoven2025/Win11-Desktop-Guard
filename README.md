@@ -1,76 +1,95 @@
-# 🛡️ Win11-Desktop-Guard
+# Win11-Desktop-Guard
 
-**Permanent Fix for Windows 11 Virtual Desktop Wallpaper Resets & Forgotten Window Positions after Reboot**  
-**Dauerhafte Lösung gegen verstellte Hintergrundbilder & vergessene Fensterpositionen auf Virtuellen Desktops unter Windows 11**
+PowerShell and C# utility for Windows 11 (23H2 / 24H2 / 25H2) to persist Virtual Desktop wallpapers and window-to-desktop assignments across reboots.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform: Windows 11](https://img.shields.io/badge/Platform-Windows%2011%20(23H2%20%2F%2024H2%20%2F%2025H2)-0078D6.svg)](#)
 
-*[🇩🇪 Deutsche Anleitung weiter unten](#-win11-desktop-guard-deutsch)*
-
----
-
-## 🇬🇧 English Overview
-
-### 😩 The Problem in Windows 11
-If you organize your workflow across multiple **Virtual Desktops** (`Win + Tab`) in Windows 11, you have likely encountered two frustrating OS bugs:
-1. **Virtual Desktop Wallpapers Randomly Reset:** After waking a monitor from sleep, restarting `explorer.exe`, or rebooting, Windows 11 frequently overwrites the wallpapers of several virtual desktops with the wallpaper of another desktop (often triggered by a phantom `SlideshowSourceDirectoriesSet` registry flag or `.webp`/`.gif` transcoding delays).
-2. **Windows Forget Which Virtual Desktop You Moved Them To:** When you move open application windows (Word, Notion, File Explorer, Terminals, Chrome windows, etc.) to specific virtual desktops via `Win + Tab` or pin them to *"Show this window on all desktops"*, Windows 11 only keeps that assignment in volatile RAM (`dwm.exe` / `explorer.exe`). After a reboot, everything lands back on Desktop 1 or its old location.
-
-### ✨ What `Win11-Desktop-Guard` Does
-- **Smart Wallpaper-Lock & Auto-Heal:**
-  - Automatically discovers your existing Virtual Desktops, names, and wallpapers on first run (**Zero-Config**).
-  - Disables the hidden Windows 11 phantom slideshow bug in the Registry.
-  - Synchronizes your wallpapers both in the Registry and directly in `explorer.exe`'s live COM state (`IVirtualDesktopManagerInternal`).
-  - **Smart Auto-Detect:** Distinguishes between the Windows duplicate-overwrite bug (heals it automatically) and **intentional wallpaper or desktop name changes** made by you (learns and saves your new wallpaper automatically!).
-- **Window-Desktop-Memory (Save & Restore across Reboots):**
-  - Periodically snapshots all open windows across all virtual desktops (including **Desktop 1..N**, **"Show this window on all desktops"**, **"Show this app on all desktops"**, exact multi-monitor coordinates, and even open **File Explorer folder paths**).
-  - Automatically moves your open windows back to their assigned Virtual Desktops after Windows logon (or with a single click).
-- **Interactive HTML Dashboard:**
-  - Generates a visual dashboard (`desktop_guard_dashboard.html`) displaying all your Virtual Desktops, wallpaper previews, and every window assigned to each desktop.
-
-### 🚀 Quick Start (No Programming Required)
-1. Download the latest release ZIP (**`Win11-Desktop-Guard-v1.0.0.zip`**) from [**Releases**](../../releases) and extract it to a permanent folder (e.g., `C:\Tools\Win11-Desktop-Guard`).
-2. Double-click **`1_Install_Desktop_Guard.cmd`**.
-   - This captures your current Virtual Desktops, wallpapers, and window positions, and registers two completely invisible background tasks in Windows Task Scheduler (`DesktopGuard_LogonRestore` & `DesktopGuard_PeriodicSync`).
-3. **Optional 1-Click Tools:**
-   - **`2_Save_Current_Layout_Now.cmd`** – Immediately saves all current wallpapers, desktop names, and window positions as the new default.
-   - **`3_Restore_Layout_Now.cmd`** – Immediately restores all wallpapers and moves windows back to their saved virtual desktops.
-   - **`4_Open_Dashboard.cmd`** – Opens your visual Virtual Desktop & Window Dashboard in your browser.
-   - **`5_Uninstall_Desktop_Guard.cmd`** – Cleanly removes the scheduled background tasks at any time.
+[Deutsche Beschreibung weiter unten](#beschreibung-deutsch)
 
 ---
 
-## 🇩🇪 Win11-Desktop-Guard (Deutsch)
+## Overview
 
-### 😩 Das Problem unter Windows 11
-Wer unter Windows 11 intensiv mit mehreren **Virtuellen Desktops** (`Win + Tab`) arbeitet, kennt zwei hartnäckige Windows-Bugs:
-1. **Hintergrundbilder verstellen sich von selbst:** Nach einem Neustart oder wenn ein Monitor aus dem Standby aufwacht, überschreibt Windows 11 plötzlich die Hintergrundbilder mehrerer Desktops mit dem Bild eines anderen Desktops (oft ausgelöst durch ein verwaistes `SlideshowSourceDirectoriesSet`-Flag in der Registry oder Verzögerungen beim Laden von `.webp`/`.gif`-Bildern).
-2. **Verschobene App-Fenster vergessen nach einem Neustart ihren Desktop:** Wenn man Fenster per `Win + Tab` (*Rechtsklick -> Verschieben nach*) auf verschiedene Desktops verteilt oder per *„Dieses Fenster auf allen Desktops anzeigen“* anheftet, speichert Windows 11 diese Zuordnung nur flüchtig im Arbeitsspeicher. Nach einem Neustart ist alles wieder am alten Platz.
+Windows 11 has two long-standing issues when working with multiple Virtual Desktops (`Win + Tab`):
 
-### ✨ Was `Win11-Desktop-Guard` löst
-- **Intelligenter Wallpaper-Schutz (Smart Auto-Detect):**
-  - Erkennt beim ersten Start automatisch alle deine vorhandenen virtuellen Desktops, deren Namen und aktuelle Hintergrundbilder (**Zero-Config**).
-  - Schaltet den versteckten Diashow-Überschreib-Bug in der Registry dauerhaft ab und synchronisiert deine Hintergrundbilder direkt über die interne Windows-11-COM-Schnittstelle.
-  - **Darfst du deine Hintergrundbilder weiterhin selbst ändern? Ja!** Das Skript unterscheidet intelligent zwischen dem Windows-Duplikat-Bug (wird sofort repariert) und einem **bewussten Bildwechsel durch dich** (wird automatisch als neuer Standard übernommen und geschützt).
-- **Fenster-Gedächtnis über Neustarts hinweg (`Window-Desktop-Memory`):**
-  - Speichert automatisch alle 5 Minuten (sowie auf Knopfdruck) für alle offenen Fenster, auf welchem virtuellen Desktop sie liegen, ob sie *„Auf allen Desktops“* angeheftet sind, ihre exakten Monitor-Koordinaten sowie die **geöffneten Ordnerpfade von Datei-Explorer-Fenstern**.
-  - Schiebt nach einem Neustart alle Fenster automatisch wieder auf ihren angestammten virtuellen Desktop zurück (und öffnet geschlossene Explorer-Ordner wieder).
-- **Visuelles Live-Dashboard:**
-  - Erstellt mit `4_Open_Dashboard.cmd` eine übersichtliche HTML-Ansicht aller deiner Desktops samt Hintergrundbild-Vorschau und Fensterliste.
+1. **Per-desktop wallpapers resetting or duplicating:** After waking monitors from standby, restarting `explorer.exe`, or rebooting, Windows 11 frequently overwrites the wallpapers of several virtual desktops with the wallpaper from another desktop. This is typically triggered by a lingering `SlideshowSourceDirectoriesSet` value under `HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers` or out-of-sync state between the `VirtualDesktops\Desktops\{GUID}` registry keys and `explorer.exe`'s in-memory `IVirtualDesktopManagerInternal` COM interface.
+2. **Window-to-desktop assignments lost on reboot:** Moving application windows across virtual desktops (or pinning windows/apps via *"Show this window on all desktops"*) is only stored in volatile memory by `dwm.exe` / `explorer.exe`. After a reboot, reopened windows all land on the primary desktop.
 
-### 🚀 Schnellstart (In 10 Sekunden eingerichtet)
-1. Lade unter [**Releases**](../../releases) die Datei **`Win11-Desktop-Guard-v1.0.0.zip`** herunter und entpacke sie in einen festen Ordner (z. B. `C:\Tools\Win11-Desktop-Guard`).
-2. Doppelklicke auf **`1_Install_Desktop_Guard.cmd`**.
-   - Deine aktuellen Desktops, Hintergrundbilder und Fensterpositionen werden automatisch erfasst und zwei völlig unsichtbare Hintergrund-Aufgaben in der Windows-Aufgabenplanung eingerichtet (kein Aufblitzen von Konsolenfenstern).
-3. **Weitere 1-Klick-Werkzeuge im Ordner:**
-   - **`2_Save_Current_Layout_Now.cmd`** – Speichert den aktuellen Stand aller Hintergrundbilder und Fenster sofort als neuen Standard.
-   - **`3_Restore_Layout_Now.cmd`** – Stellt alle Hintergrundbilder und Fensterpositionen sofort wieder her.
-   - **`4_Open_Dashboard.cmd`** – Öffnet das visuelle Dashboard im Browser.
-   - **`5_Uninstall_Desktop_Guard.cmd`** – Entfernt die Hintergrundaufgaben jederzeit rückstandslos.
+`Win11-Desktop-Guard` addresses both issues using native Windows PowerShell scripts and a small C# Win32/COM helper (`DesktopGuard.dll` + Markus Scholtes's `VirtualDesktop11-24H2.cs`).
+
+## How It Works
+
+* **`restore_wallpapers.ps1`**
+  Reads the `VirtualDesktopIDs` byte array from `HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VirtualDesktops`, disables the slideshow registry flag (`BackgroundType = 0`, `SlideshowSourceDirectoriesSet = 0`), and synchronizes desktop names and wallpaper paths both in the Registry and via `IVirtualDesktopManagerInternal` (`VirtualDesktop11.exe`).
+  If a wallpaper changes on a single desktop to a new file path, the script updates `desktop_config.json` with the new path. If Windows overwrites a desktop's wallpaper with a duplicate from another desktop, the previous wallpaper from `desktop_config.json` is restored.
+
+* **`save_window_layout.ps1`**
+  Uses `DesktopGuard.dll` (`EnumWindows`, `GetWindowPlacement`, `IVirtualDesktopManager::GetWindowDesktopId`) and `Shell.Application` COM to record open top-level windows, their assigned Virtual Desktop GUID, pin state (`{BB64D5B7-4DE3-4AB2-A87C-DB7601AEA7DC}` for window pins, `{C2DDEA68-66F2-4CF9-8264-1BFD00FBBBAC}` for app pins), window coordinates, and open File Explorer directory paths to `window_layout.json`. Also writes a local HTML overview (`desktop_guard_dashboard.html`).
+
+* **`restore_window_layout.ps1`**
+  Runs after logon (or manually), restores the wallpaper configuration, optionally reopens saved File Explorer directories, matches running windows by process name, window class (`ClassName`), title, and coordinates, and moves them back to their recorded Virtual Desktop.
+
+## Installation & Usage
+
+No third-party runtimes are required (uses built-in Windows PowerShell 5.1 and `.NET Framework 4.x` `csc.exe` if binaries need to be rebuilt from `src/`).
+
+1. Extract the repository or release archive to a permanent folder (for example `C:\Tools\Win11-Desktop-Guard`).
+2. Run **`1_Install_Desktop_Guard.cmd`**.
+   This saves your current Virtual Desktop configuration (`desktop_config.json`) and window positions (`window_layout.json`), and registers two user-level Scheduled Tasks (`DesktopGuard_LogonRestore` at logon and `DesktopGuard_PeriodicSync` every 5 minutes via `wscript.exe //B run_hidden.vbs`).
+
+### Helper Batch Files
+
+* `1_Install_Desktop_Guard.cmd` - Initial snapshot and Scheduled Task registration
+* `2_Save_Current_Layout_Now.cmd` - Manually save current wallpapers, desktop names, and window positions
+* `3_Restore_Layout_Now.cmd` - Manually restore wallpapers and move open windows to their saved desktops
+* `4_Open_Dashboard.cmd` - Refresh and open `desktop_guard_dashboard.html`
+* `5_Uninstall_Desktop_Guard.cmd` - Remove the `DesktopGuard_LogonRestore` and `DesktopGuard_PeriodicSync` scheduled tasks
+
+## Repository Structure
+
+```text
+Win11-Desktop-Guard/
+├── bin/
+│   ├── DesktopGuard.dll          # Compiled Win32 / IVirtualDesktopManager helper
+│   └── VirtualDesktop11.exe      # Compiled C# wrapper (MScholtes/VirtualDesktop)
+├── src/
+│   ├── DesktopGuard.cs           # C# source for window enumeration & desktop GUID lookup
+│   └── VirtualDesktop11-24H2.cs  # C# source for Win11 24H2/25H2 COM interop
+├── restore_wallpapers.ps1        # Wallpaper & desktop name synchronization
+├── save_window_layout.ps1        # Window layout snapshot & HTML status page generator
+├── restore_window_layout.ps1     # Window layout restore script
+├── periodic_sync.ps1             # Wrapper called by the 5-minute scheduled task
+├── install_desktop_guard.ps1     # Scheduled task installer
+├── uninstall_desktop_guard.ps1   # Scheduled task uninstaller
+└── run_hidden.vbs                # Runs PowerShell tasks without flashing a console window
+```
 
 ---
 
-## 🙏 Credits & License
-- Released under the [**MIT License**](LICENSE).
-- Uses [`VirtualDesktop`](https://github.com/MScholtes/VirtualDesktop) (`VirtualDesktop11-24H2.cs`, MIT License) by **Markus Scholtes** for native Windows 11 24H2/25H2 COM interop (`IVirtualDesktopManagerInternal`).
+## Beschreibung (Deutsch)
+
+### Hintergrund
+
+Beim Arbeiten mit mehreren virtuellen Desktops (`Win + Tab`) unter Windows 11 treten häufig zwei Probleme auf:
+
+1. **Hintergrundbilder verstellen sich:** Nach einem Neustart, Explorer-Neustart oder dem Aufwachen eines Monitors aus dem Standby überschreibt Windows 11 oft die Hintergrundbilder einzelner virtueller Desktops mit dem Bild eines anderen Desktops. Ursache ist meist ein verwaistes `SlideshowSourceDirectoriesSet`-Flag in der Registry (`HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers`) oder eine Abweichung zwischen den Registry-Einträgen unter `VirtualDesktops\Desktops` und dem internen COM-Zustand von `explorer.exe`.
+2. **Fenster-Zuordnungen gehen beim Neustart verloren:** Welche offenen Anwendungsfenster auf welchem virtuellen Desktop liegen (oder ob sie per *„Dieses Fenster auf allen Desktops anzeigen“* angeheftet sind), merkt sich Windows 11 nur im Arbeitsspeicher. Nach einem Neustart landen alle Fenster wieder auf Desktop 1.
+
+### Funktionsweise
+
+* **`restore_wallpapers.ps1`** liest beim ersten Start die vorhandenen virtuellen Desktops und deren zugewiesene Hintergrundbilder aus der Registry aus, legt `desktop_config.json` an, deaktiviert das Diashow-Flag und setzt Namen sowie Hintergrundbilder über die Registry und die COM-Schnittstelle (`VirtualDesktop11.exe`). Wenn man selbst ein neues Bild für einen einzelnen Desktop auswählt, übernimmt das Skript den neuen Pfad automatisch in die `desktop_config.json`. Wird ein Desktop hingegen durch den Windows-Bug mit dem Bild eines anderen Desktops überschrieben, stellt das Skript das ursprüngliche Bild wieder her.
+* **`save_window_layout.ps1`** speichert alle offenen Anwendungsfenster inklusive Desktop-GUID, Anheft-Status (*Fenster/App auf allen Desktops*), Fensterkoordinaten und geöffneter Ordnerpfade im Datei-Explorer in `window_layout.json` und erzeugt eine lokale HTML-Übersicht (`desktop_guard_dashboard.html`).
+* **`restore_window_layout.ps1`** stellt nach der Windows-Anmeldung (oder manuell per Skript) die Hintergrundbilder wieder her, öffnet bei Bedarf die gespeicherten Explorer-Ordner und verschiebt die laufenden Fenster anhand von Prozessname, Fensterklasse, Fenstertitel und Position wieder auf ihren jeweiligen virtuellen Desktop.
+
+### Einrichtung
+
+1. Repository oder Release-ZIP (`Win11-Desktop-Guard-v1.0.0.zip`) in einen festen Ordner entpacken (z. B. `C:\Tools\Win11-Desktop-Guard`).
+2. **`1_Install_Desktop_Guard.cmd`** ausführen. Dadurch werden der aktuelle Zustand gespeichert und zwei Aufgaben in der Windows-Aufgabenplanung angelegt (`DesktopGuard_LogonRestore` bei Anmeldung sowie `DesktopGuard_PeriodicSync` alle 5 Minuten im Hintergrund über `wscript.exe`).
+3. Über **`5_Uninstall_Desktop_Guard.cmd`** lassen sich beide Aufgaben jederzeit wieder aus der Aufgabenplanung entfernen.
+
+---
+
+## Credits & License
+
+* Licensed under the [MIT License](LICENSE).
+* Includes [`VirtualDesktop`](https://github.com/MScholtes/VirtualDesktop) (`VirtualDesktop11-24H2.cs`, MIT License) by Markus Scholtes for Windows 11 24H2/25H2 `IVirtualDesktopManagerInternal` COM interop.

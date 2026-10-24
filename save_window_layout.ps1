@@ -1,6 +1,6 @@
 # ==============================================================================
-# Win11-Desktop-Guard: Window-Desktop-Memory (Save Layout & Dashboard)
-# Captures all open windows across all virtual desktops, pinned states,
+# Win11-Desktop-Guard: Save Window Layout & HTML Status Page
+# Captures open windows across virtual desktops, pinned states,
 # monitor coordinates, and open File Explorer folder paths.
 # ==============================================================================
 param(
@@ -111,9 +111,9 @@ if ($outArray.Count -ge 2) {
 }
 
 if ($UpdateDashboard -and $outArray.Count -gt 0) {
-    $titleStr = if ($isDe) { "Win11-Desktop-Guard – Live-Status deiner Virtuellen Desktops" } else { "Win11-Desktop-Guard – Virtual Desktops Live Status" }
-    $subStr = if ($isDe) { "Zuletzt aktualisiert: $(Get-Date -Format 'dd.MM.yyyy HH:mm:ss') | $($config.Desktops.Count) Virtuelle Desktops & $($outArray.Count) aktive Fenster" } else { "Last updated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') | $($config.Desktops.Count) Virtual Desktops & $($outArray.Count) active windows" }
-    $pinHeader = if ($isDe) { "📌 Auf allen Desktops angeheftet" } else { "📌 Pinned to All Desktops" }
+    $titleStr = if ($isDe) { "Win11-Desktop-Guard - Virtuelle Desktops" } else { "Win11-Desktop-Guard - Virtual Desktops Status" }
+    $subStr = if ($isDe) { "Stand: $(Get-Date -Format 'dd.MM.yyyy HH:mm:ss') | $($config.Desktops.Count) Virtuelle Desktops, $($outArray.Count) Fenster" } else { "Updated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') | $($config.Desktops.Count) Virtual Desktops, $($outArray.Count) windows" }
+    $pinHeader = if ($isDe) { "Auf allen Desktops angeheftet" } else { "Pinned to All Desktops" }
     $emptyMsg = if ($isDe) { "Keine exklusiven Fenster auf diesem Desktop geöffnet" } else { "No exclusive windows open on this desktop" }
     $winWord = if ($isDe) { "Fenster" } else { "windows" }
 
@@ -147,7 +147,7 @@ if ($UpdateDashboard -and $outArray.Count -gt 0) {
 </head>
 <body>
 <div class="container">
-  <h1>🛡️ $titleStr</h1>
+  <h1>$titleStr</h1>
   <p class="subtitle">$subStr</p>
   <div class="grid">
 "@)
@@ -170,7 +170,7 @@ if ($UpdateDashboard -and $outArray.Count -gt 0) {
         $wpUrl = if ($d.Wallpaper) { "file:///" + ($d.Wallpaper -replace "\\","/" -replace "'","%27") } else { "" }
         $wpFile = if ($d.Wallpaper) { Split-Path $d.Wallpaper -Leaf } else { "Default" }
         [void]$sb.AppendLine("    <div class='desktop-card'>")
-        [void]$sb.AppendLine("      <div class='wp-banner' style=`"background-image:url('$wpUrl')`"><div class='wp-overlay'></div><div style='width:100%'><div class='wp-title'><h2>Desktop $($d.Index): $($d.Name)</h2><span class='wp-path'>$($dWins.Count) $winWord</span></div><div class='wp-path'>🖼️ $wpFile</div></div></div>")
+        [void]$sb.AppendLine("      <div class='wp-banner' style=`"background-image:url('$wpUrl')`"><div class='wp-overlay'></div><div style='width:100%'><div class='wp-title'><h2>Desktop $($d.Index): $($d.Name)</h2><span class='wp-path'>$($dWins.Count) $winWord</span></div><div class='wp-path'>$wpFile</div></div></div>")
         [void]$sb.AppendLine("      <ul class='win-list'>")
         if ($dWins.Count -eq 0) {
             [void]$sb.AppendLine("        <li class='win-item' style='color:#64748b'>$emptyMsg</li>")
